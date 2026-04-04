@@ -92,6 +92,48 @@ Important rules:
 - property aliases are normalized
 - `logp` is normalized to `plogp`
 
+## LoRA Target Modules
+
+LoRA injection is still done through the shared training logic in `trainer.py`.
+
+Current behavior:
+
+- if `lora_target_modules` is explicitly provided, that value is used
+- otherwise the code auto-selects target modules from the model name / path
+
+Currently supported model families:
+
+- `mistral`
+- `llama`
+
+The default target modules for both are currently:
+
+- `q_proj`
+- `k_proj`
+- `v_proj`
+- `o_proj`
+- `gate_proj`
+- `up_proj`
+- `down_proj`
+- `lm_head`
+
+This means the server-side local Llama path below is expected to be auto-detected as a `llama` model:
+
+```bash
+/home/xy/workspace/llm/Llama-3-8-ins
+```
+
+If needed, you can still override manually:
+
+```bash
+python cl_train.py \
+  --config configs/cl/naive_sequence.yaml \
+  --base-model /home/xy/workspace/llm/Llama-3-8-ins \
+  --method naive_sequence
+```
+
+If future models use different internal layer names, update the family mapping in `config.py`.
+
 ## Output Layout
 
 Training outputs:

@@ -10,20 +10,17 @@ tasks=$5
 opt_type="simple"
 resume_from_checkpoint=$7
 
-model_lower=$(echo $model | tr '[:upper:]' '[:lower:]')
-#base_model="${model_dir}/${base_model}/"
-lora_target_modules="['q_proj','k_proj','v_proj','o_proj','gate_proj','up_proj','down_proj','lm_head']"
+model_lower=$(echo "$base_model" | tr '[:upper:]' '[:lower:]')
 
 #if resume_from_checkpoint is not None, then the model will be loaded from the checkpoint, else set to False
 if [[ $resume_from_checkpoint == "" ]]; then
    resume_from_checkpoint=False
 fi
 
-if [[ $model == "Llama-3.1-70B-Instruct" ]]; then
+if [[ "$base_model" == *"Llama-3.1-70B-Instruct"* ]]; then
    python trainer.py \
       --data_path $data_dir \
       --base_model $base_model \
-      --lora_target_modules $lora_target_modules \
       --output_dir $expt_dir \
       --num_epochs $num_epochs \
       --opt_type $opt_type \
@@ -35,7 +32,6 @@ else
    python trainer.py \
       --data_path $data_dir \
       --base_model $base_model \
-      --lora_target_modules $lora_target_modules \
       --output_dir $expt_dir \
       --num_epochs $num_epochs \
       --opt_type $opt_type \

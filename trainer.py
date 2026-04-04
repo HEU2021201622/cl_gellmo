@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 from typing import List, Mapping, Optional, Sequence
 
 import pandas as pd
@@ -19,6 +20,7 @@ from transformers import (
 )
 from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
 
+from config import LORA_TARGET_MODULES_BY_FAMILY
 from prompter import Prompter
 
 disable_caching()
@@ -88,6 +90,42 @@ def _load_model_and_tokenizer(
     pad = tokenizer.pad_token_id
     print("pre-trained model's BOS EOS and PAD token id:", bos, eos, pad, "=> pad is reset to 0")
     return model, tokenizer
+
+
+def _infer_model_family(base_model: str, model_config=None) -> Optional[str]:
+    candidates = []
+    if model_config is not None:
+        for attr in ("model_type", "architectures", "_name_or_path"):
+            value = getattr(model_config, attr, None)
+            if isinstance(value, str):
+                candidates.append(value)
+            elif isinstance(value, list):
+                candidates.extend(str(item) for item in value)
+
+    base_name = Path(base_model).name
+    candidates.extend([base_model, base_name])
+    haystack = " ".join(str(item).lower() for item in candidates if item)
+
+    if "mistral" in haystack:
+        return "mistral"
+    if "llama" in haystack or "llama-3" in haystack or "llama3" in haystack:
+        return "llama"
+    return None
+
+
+def resolve_lora_target_modules(base_model: str, model_config=None, lora_target_modules: Optional[List[str]] = None) -> List[str]:
+    if lora_target_modules:
+        return lora_target_modules
+
+    family = _infer_model_family(base_model, model_config=model_config)
+    if family and family in LORA_TARGET_MODULES_BY_FAMILY:
+        resolved = list(LORA_TARGET_MODULES_BY_FAMILY[family])
+        print(f"Auto-selected LoRA target modules for {family}: {resolved}")
+        return resolved
+
+    fallback = list(LORA_TARGET_MODULES_BY_FAMILY["mistral"])
+    print(f"Falling back to default LoRA target modules: {fallback}")
+    return fallback
 
 
 def _build_prompt_tokenizer(
@@ -184,16 +222,6 @@ def train_on_records(
     optim: str = "adamw_torch",
     log_prefix: str = "",
 ):
-    lora_target_modules = lora_target_modules or [
-        "q_proj",
-        "k_proj",
-        "v_proj",
-        "o_proj",
-        "gate_proj",
-        "up_proj",
-        "down_proj",
-        "lm_head",
-    ]
     assert base_model, "Please specify a --base_model"
 
     gradient_accumulation_steps = batch_size // micro_batch_size
@@ -222,6 +250,11 @@ def train_on_records(
         base_model=base_model,
         load_in_8bit=load_in_8bit,
         device_map=device_map,
+    )
+    lora_target_modules = resolve_lora_target_modules(
+        base_model=base_model,
+        model_config=model.config,
+        lora_target_modules=lora_target_modules,
     )
     bf16 = True
 

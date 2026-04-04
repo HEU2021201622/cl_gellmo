@@ -26,16 +26,28 @@ PROPERTY_ALIASES = {
 
 CL_PROPERTY_ORDER = ["drd2", "qed", "plogp", "jnk3"]
 CL_DEFAULT_BASE_MODEL = "mistralai/Mistral-7B-Instruct-v0.3"
-CL_DEFAULT_LORA_TARGET_MODULES = [
-    "q_proj",
-    "k_proj",
-    "v_proj",
-    "o_proj",
-    "gate_proj",
-    "up_proj",
-    "down_proj",
-    "lm_head",
-]
+LORA_TARGET_MODULES_BY_FAMILY = {
+    "mistral": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+        "lm_head",
+    ],
+    "llama": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+        "lm_head",
+    ],
+}
 CL_OUTPUT_DIRS = {
     "train_root": "outputs/cl_train",
     "infer_root": "outputs/cl_infer",

@@ -4,7 +4,7 @@ from typing import Any, Dict, Iterable
 
 import yaml
 
-from config import CL_DEFAULT_BASE_MODEL, CL_DEFAULT_LORA_TARGET_MODULES
+from config import CL_DEFAULT_BASE_MODEL
 
 
 def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
@@ -36,7 +36,7 @@ def load_cl_config(config_path: str) -> Dict[str, Any]:
     config.setdefault("base_model", CL_DEFAULT_BASE_MODEL)
     config.setdefault("prompt_template_name", "mistral")
     config.setdefault("opt_type", "simple")
-    config.setdefault("lora_target_modules", CL_DEFAULT_LORA_TARGET_MODULES)
+    config.setdefault("lora_target_modules", None)
     config.setdefault("learning_rate", 1e-4)
     config.setdefault("num_epochs", 1)
     config.setdefault("batch_size", 128)
