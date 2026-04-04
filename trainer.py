@@ -60,6 +60,59 @@ class LoadBestPeftModelCallback(TrainerCallback):
         return control
 
 
+def _build_training_args(
+    *,
+    has_val: bool,
+    gradient_checkpointing: bool,
+    micro_batch_size: int,
+    gradient_accumulation_steps: int,
+    warmup_ratio: float,
+    num_epochs: int,
+    learning_rate: float,
+    bf16: bool,
+    optim: str,
+    lr_scheduler: str,
+    output_dir: str,
+    ddp,
+    group_by_length: bool,
+    use_wandb: bool,
+    wandb_run_name: str,
+):
+    args = dict(
+        gradient_checkpointing=gradient_checkpointing,
+        per_device_train_batch_size=micro_batch_size,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        warmup_ratio=warmup_ratio,
+        num_train_epochs=num_epochs,
+        learning_rate=learning_rate,
+        bf16=bf16,
+        logging_steps=1,
+        optim=optim,
+        lr_scheduler_type=lr_scheduler,
+        output_dir=output_dir,
+        save_total_limit=2,
+        ddp_find_unused_parameters=False if ddp else None,
+        group_by_length=group_by_length,
+        report_to="wandb" if use_wandb else None,
+        run_name=wandb_run_name if use_wandb else None,
+    )
+
+    if has_val:
+        args.update(
+            eval_strategy="epoch",
+            save_strategy="epoch",
+            load_best_model_at_end=True,
+        )
+    else:
+        args.update(
+            eval_strategy="no",
+            save_strategy="steps",
+            save_steps=1000,
+            load_best_model_at_end=False,
+        )
+    return TrainingArguments(**args)
+
+
 def _print_train_params(params: Mapping[str, object]) -> None:
     if int(os.environ.get("LOCAL_RANK", 0)) != 0:
         return
@@ -295,35 +348,31 @@ def train_on_records(
     num_tokens = sum(len(row["input_ids"]) for row in train_dataset)
     print(f"{log_prefix}#tokens: {num_tokens / 1000.0:.1f}k")
 
+    has_val = len(val_dataset) > 0
     callbacks = [SavePeftModelCallback()]
-    if len(val_dataset):
+    if has_val:
         callbacks.append(LoadBestPeftModelCallback())
 
     trainer = Trainer(
         model=model,
         train_dataset=train_dataset,
-        eval_dataset=val_dataset if len(val_dataset) else None,
-        args=TrainingArguments(
+        eval_dataset=val_dataset if has_val else None,
+        args=_build_training_args(
+            has_val=has_val,
             gradient_checkpointing=gradient_checkpointing,
-            per_device_train_batch_size=micro_batch_size,
+            micro_batch_size=micro_batch_size,
             gradient_accumulation_steps=gradient_accumulation_steps,
             warmup_ratio=warmup_ratio,
-            num_train_epochs=num_epochs,
+            num_epochs=num_epochs,
             learning_rate=learning_rate,
             bf16=bf16,
-            logging_steps=1,
             optim=optim,
-            eval_strategy="epoch" if len(val_dataset) > 0 else "no",
-            save_strategy="steps",
-            save_steps=1000,
-            lr_scheduler_type=lr_scheduler,
+            lr_scheduler=lr_scheduler,
             output_dir=output_dir,
-            save_total_limit=10,
-            load_best_model_at_end=True if len(val_dataset) > 0 else False,
-            ddp_find_unused_parameters=False if ddp else None,
+            ddp=ddp,
             group_by_length=group_by_length,
-            report_to="wandb" if use_wandb else None,
-            run_name=wandb_run_name if use_wandb else None,
+            use_wandb=use_wandb,
+            wandb_run_name=wandb_run_name,
         ),
         data_collator=DataCollatorForSeq2Seq(
             tokenizer,

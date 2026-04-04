@@ -127,6 +127,14 @@ def _sample_records(records: Sequence[Dict], limit: int, seed: int) -> List[Dict
     return rng.sample(records, limit)
 
 
+def _sample_per_task(records: Sequence[Dict], tasks: Sequence[str], split: str, limit: int, seed: int) -> List[Dict]:
+    sampled = []
+    for index, task in enumerate(tasks):
+        task_records = filter_records(records, split, [task])
+        sampled.extend(_sample_records(task_records, limit, seed + index))
+    return sampled
+
+
 def _group_counts(records: Iterable[Dict], key: str) -> Dict[str, int]:
     counter = defaultdict(int)
     for record in records:
@@ -183,8 +191,10 @@ def build_joint_dataset(
     val_limit: int,
     seed: int,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, Dict]:
-    train_records = _sample_records(filter_records(records, "train", tasks), train_limit, seed)
-    val_records = _sample_records(filter_records(records, "val", tasks), val_limit, seed + 1)
+    per_task_train_limit = train_limit if train_limit and train_limit > 0 else None
+    per_task_val_limit = val_limit if val_limit and val_limit > 0 else None
+    train_records = _sample_per_task(records, tasks, "train", per_task_train_limit, seed)
+    val_records = _sample_per_task(records, tasks, "val", per_task_val_limit, seed + 1000)
     metadata = {
         "step": "all",
         "joint_tasks": [normalize_task_name(task) for task in tasks],

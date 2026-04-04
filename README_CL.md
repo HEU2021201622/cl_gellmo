@@ -63,7 +63,7 @@ Implemented training modes:
 - `replay`
   - trains on current-step single-property data plus replay
 - `joint_all`
-  - one-shot joint upper-bound baseline over all four single-property tasks
+  - one-shot sample-matched joint baseline over all four single-property tasks
 
 ## Data Assumptions
 
@@ -155,6 +155,12 @@ Each step directory is designed to be reusable later by infer/eval code and incl
 - optional `step_train_records.jsonl` and `step_val_records.jsonl`
 - replay metadata files for replay runs after real training
 
+Checkpoint policy:
+
+- intermediate `checkpoint-*` directories are for training recovery only
+- at most 2 intermediate checkpoints are kept
+- the step root directory is always kept as the final output
+
 ## Validation Status
 
 ### Confirmed on CPU
@@ -171,6 +177,7 @@ The current machine may kill long runs that repeatedly scan the full training ta
 
 - `naive_sequence` four-step dry-run is confirmed
 - `replay` logic is confirmed, but a fresh full four-step replay dry-run should still be re-run on the server after any config change
+- `joint_all` now uses per-task limits instead of consuming all available single-property records
 
 Recommended first check on the server:
 

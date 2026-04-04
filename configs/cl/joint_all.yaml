@@ -1,6 +1,7 @@
 base_config: base.yaml
 method: joint_all
 output_root: outputs/cl_train/joint_all
+train_limit: 20000
 joint_tasks:
   - drd2
   - qed
