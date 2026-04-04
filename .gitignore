@@ -26,5 +26,5 @@ env/
 .DS_Store
 Thumbs.db
 
-# data自己上传，lft似乎有问题
+# 文件自己传，受不了了
 data/

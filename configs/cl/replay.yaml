@@ -10,10 +10,10 @@ steps:
     combo_tasks: []
   step2:
     new_tasks: [qed]
-    combo_tasks: [drd2+qed]
+    combo_tasks: []
   step3:
     new_tasks: [plogp]
-    combo_tasks: [drd2+qed+plogp]
+    combo_tasks: []
   step4:
     new_tasks: [jnk3]
-    combo_tasks: [drd2+qed+plogp+jnk3]
+    combo_tasks: []

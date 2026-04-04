@@ -52,18 +52,18 @@ The new code currently focuses on training only. Inference and evaluation for CL
 The staged CL setup is currently fixed to four steps:
 
 1. `step1`: `drd2`
-2. `step2`: `qed` + combo calibration `drd2+qed`
-3. `step3`: `plogp` + combo calibration `drd2+qed+plogp`
-4. `step4`: `jnk3` + combo calibration `drd2+qed+plogp+jnk3`
+2. `step2`: `qed`
+3. `step3`: `plogp`
+4. `step4`: `jnk3`
 
 Implemented training modes:
 
 - `naive_sequence`
-  - trains on `new + combo`
+  - trains on current-step single-property data only
 - `replay`
-  - trains on `new + combo + replay`
+  - trains on current-step single-property data plus replay
 - `joint_all`
-  - one-shot joint upper-bound baseline
+  - one-shot joint upper-bound baseline over all four single-property tasks
 
 ## Data Assumptions
 
@@ -163,14 +163,14 @@ Each step directory is designed to be reusable later by infer/eval code and incl
 - `replay` dry-run passed for:
   - full `step1 -> step2` replay path
   - `step3 -> step4` path and checkpoint chaining
-- `joint_all` dry-run succeeded at least once earlier
+- `joint_all` data loading path is valid, but dry-run may still be killed on the current machine due to resource limits
 
 ### Limitation
 
 The current machine may kill long runs that repeatedly scan the full training table. Because of that:
 
 - `naive_sequence` four-step dry-run is confirmed
-- `replay` logic is confirmed, but a full one-shot four-step replay dry-run should be re-run on the server
+- `replay` logic is confirmed, but a fresh full four-step replay dry-run should still be re-run on the server after any config change
 
 Recommended first check on the server:
 
