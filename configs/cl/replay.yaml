@@ -1,0 +1,19 @@
+base_config: base.yaml
+method: replay
+output_root: outputs/cl_train/replay
+buffer_capacity: 5000
+replay_ratio: 0.2
+buffer_update_strategy: task-balanced
+steps:
+  step1:
+    new_tasks: [drd2]
+    combo_tasks: []
+  step2:
+    new_tasks: [qed]
+    combo_tasks: [drd2+qed]
+  step3:
+    new_tasks: [plogp]
+    combo_tasks: [drd2+qed+plogp]
+  step4:
+    new_tasks: [jnk3]
+    combo_tasks: [drd2+qed+plogp+jnk3]

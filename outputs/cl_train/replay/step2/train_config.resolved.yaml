@@ -1,0 +1,63 @@
+base_model: mistralai/Mistral-7B-Instruct-v0.3
+prompt_template_name: mistral
+opt_type: simple
+data_root: data
+train_file: all_data/train.jsonl
+learning_rate: 0.0001
+num_epochs: 1
+batch_size: 128
+micro_batch_size: 1
+cutoff_len: 4096
+warmup_ratio: 0.1
+lr_scheduler: cosine
+optim: adamw_torch
+seed: 42
+train_on_inputs: false
+add_eos_token: false
+group_by_length: false
+gradient_checkpointing: false
+load_in_8bit: false
+buffer_capacity: 5000
+replay_ratio: 0.2
+buffer_update_strategy: task-balanced
+new_limit: 20000
+combo_limit: 2000
+val_limit: 1000
+save_step_records: true
+wandb_project: ''
+wandb_run_name: ''
+wandb_watch: ''
+wandb_log_model: ''
+base_config: base.yaml
+method: replay
+output_root: outputs/cl_train/replay
+steps:
+  step1:
+    new_tasks:
+    - drd2
+    combo_tasks: []
+  step2:
+    new_tasks:
+    - qed
+    combo_tasks:
+    - drd2+qed
+  step3:
+    new_tasks:
+    - plogp
+    combo_tasks:
+    - drd2+qed+plogp
+  step4:
+    new_tasks:
+    - jnk3
+    combo_tasks:
+    - drd2+qed+plogp+jnk3
+lora_target_modules:
+- q_proj
+- k_proj
+- v_proj
+- o_proj
+- gate_proj
+- up_proj
+- down_proj
+- lm_head
+val_file: null

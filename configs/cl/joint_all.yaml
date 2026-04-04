@@ -1,0 +1,11 @@
+base_config: base.yaml
+method: joint_all
+output_root: outputs/cl_train/joint_all
+joint_tasks:
+  - drd2
+  - qed
+  - plogp
+  - jnk3
+  - drd2+qed
+  - drd2+qed+plogp
+  - drd2+qed+plogp+jnk3

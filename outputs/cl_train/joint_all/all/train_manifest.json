@@ -1,0 +1,33 @@
+{
+  "method": "joint_all",
+  "step": "all",
+  "base_model": "mistralai/Mistral-7B-Instruct-v0.3",
+  "checkpoint_dir": "outputs/cl_train/joint_all/all",
+  "resume_adapter": null,
+  "prompt_template_name": "mistral",
+  "opt_type": "simple",
+  "train_count": 389394,
+  "val_count": 1000,
+  "joint_tasks": [
+    "drd2",
+    "qed",
+    "plogp",
+    "jnk3",
+    "drd2+qed",
+    "drd2+qed+plogp",
+    "drd2+qed+plogp+jnk3"
+  ],
+  "train_task_counts": {
+    "qed": 142076,
+    "plogp": 95354,
+    "drd2+qed": 24174,
+    "drd2": 105079,
+    "jnk3": 22711
+  },
+  "val_task_counts": {
+    "qed": 401,
+    "plogp": 258,
+    "drd2": 273,
+    "drd2+qed": 68
+  }
+}

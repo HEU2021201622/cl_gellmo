@@ -1,0 +1,33 @@
+{
+  "method": "naive_sequence",
+  "step": "step2",
+  "base_model": "mistralai/Mistral-7B-Instruct-v0.3",
+  "checkpoint_dir": "outputs/cl_train/naive_sequence/step2",
+  "resume_adapter": "outputs/cl_train/naive_sequence/step1",
+  "prompt_template_name": "mistral",
+  "opt_type": "simple",
+  "train_count": 22000,
+  "val_count": 2000,
+  "new_tasks": [
+    "qed"
+  ],
+  "combo_tasks": [
+    "drd2+qed"
+  ],
+  "train_new_count": 20000,
+  "train_combo_count": 2000,
+  "val_new_count": 1000,
+  "val_combo_count": 1000,
+  "train_task_counts": {
+    "qed": 20000,
+    "drd2+qed": 2000
+  },
+  "val_task_counts": {
+    "qed": 1000,
+    "drd2+qed": 1000
+  },
+  "replay_count": 0,
+  "buffer_capacity": 5000,
+  "replay_ratio": 0.2,
+  "buffer_strategy": "task-balanced"
+}
