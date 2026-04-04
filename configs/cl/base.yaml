@@ -22,7 +22,7 @@ replay_ratio: 0.2
 buffer_update_strategy: task-balanced
 new_limit: 20000
 combo_limit: 2000
-val_limit: 1000
+val_limit: 0
 save_step_records: true
 wandb_project: ""
 wandb_run_name: ""

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Mapping, Optional, Sequence
 
 import pandas as pd
+import safetensors.torch
 import torch
 from datasets import Dataset, disable_caching, load_dataset
 from peft import LoraConfig, get_peft_model, set_peft_model_state_dict
@@ -53,8 +54,19 @@ class LoadBestPeftModelCallback(TrainerCallback):
         **kwargs,
     ):
         print(f"Loading best peft model from {state.best_model_checkpoint} (score: {state.best_metric}).")
-        best_model_path = os.path.join(state.best_model_checkpoint, "adapter_model.bin")
-        adapters_weights = torch.load(best_model_path, weights_only=True)
+        candidate_paths = [
+            os.path.join(state.best_model_checkpoint, "adapter_model.safetensors"),
+            os.path.join(state.best_model_checkpoint, "adapter_model.bin"),
+        ]
+        best_model_path = next((path for path in candidate_paths if os.path.exists(path)), None)
+        if best_model_path is None:
+            print(f"Best-model reload skipped because no adapter weights were found in {state.best_model_checkpoint}.")
+            return control
+
+        if best_model_path.endswith(".safetensors"):
+            adapters_weights = safetensors.torch.load_file(best_model_path)
+        else:
+            adapters_weights = torch.load(best_model_path, weights_only=True)
         model = kwargs["model"]
         set_peft_model_state_dict(model, adapters_weights)
         return control
