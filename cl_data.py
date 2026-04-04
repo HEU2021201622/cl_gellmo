@@ -74,17 +74,43 @@ def load_pairwise_records(path: str) -> List[Dict]:
     records: List[Dict] = []
 
     if suffix == ".jsonl":
-        with open(file_path, "r") as handle:
-            for line in handle:
-                line = line.strip()
-                if not line:
+        with open(file_path, "r", encoding="utf-8-sig") as handle:
+            first_nonempty = None
+            for raw_line in handle:
+                stripped = raw_line.strip()
+                if not stripped or stripped.startswith("#"):
                     continue
-                records.append(normalize_record(json.loads(line)))
+                first_nonempty = stripped
+                break
+
+        if first_nonempty is None:
+            return records
+
+        if first_nonempty.startswith("["):
+            with open(file_path, "r", encoding="utf-8-sig") as handle:
+                data = json.load(handle)
+            if not isinstance(data, list):
+                raise ValueError(f"Expected a JSON array in {file_path}, got {type(data)}")
+            return [normalize_record(record) for record in data]
+
+        with open(file_path, "r", encoding="utf-8-sig") as handle:
+            for line_no, raw_line in enumerate(handle, start=1):
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                try:
+                    records.append(normalize_record(json.loads(line)))
+                except json.JSONDecodeError as exc:
+                    preview = line[:200]
+                    raise ValueError(
+                        f"Failed to parse JSONL record in {file_path} at line {line_no}: {preview}"
+                    ) from exc
     elif suffix == ".json":
-        data = json.load(open(file_path, "r"))
+        with open(file_path, "r", encoding="utf-8-sig") as handle:
+            data = json.load(handle)
         records = [normalize_record(record) for record in data]
     elif suffix == ".csv":
-        with open(file_path, "r") as handle:
+        with open(file_path, "r", encoding="utf-8-sig") as handle:
             reader = csv.DictReader(handle)
             records = [normalize_record(row) for row in reader]
     else:
