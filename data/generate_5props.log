@@ -1,149 +1,0 @@
-Loading unique SMILES...
-Loaded 229018 unique molecules
-Predicting JNK3 for 229018 molecules with 60 workers...
-Found local copy...
-JNK3:   0%|          | 0/46 [00:00<?, ?it/s]Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-JNK3:   2%|▏         | 1/46 [02:50<2:07:49, 170.44s/it]JNK3:   4%|▍         | 2/46 [02:50<51:35, 70.36s/it]   JNK3:   9%|▊         | 4/46 [02:51<18:26, 26.35s/it]JNK3:  13%|█▎        | 6/46 [02:51<09:17, 13.95s/it]JNK3:  17%|█▋        | 8/46 [02:51<05:17,  8.36s/it]JNK3:  20%|█▉        | 9/46 [02:51<04:01,  6.54s/it]JNK3:  24%|██▍       | 11/46 [02:52<02:24,  4.12s/it]JNK3:  26%|██▌       | 12/46 [02:53<01:56,  3.44s/it]JNK3:  28%|██▊       | 13/46 [03:01<02:28,  4.50s/it]JNK3:  30%|███       | 14/46 [03:35<06:23, 12.00s/it]JNK3:  33%|███▎      | 15/46 [03:36<04:39,  9.01s/it]JNK3:  35%|███▍      | 16/46 [03:36<03:20,  6.68s/it]JNK3:  41%|████▏     | 19/46 [03:36<01:23,  3.11s/it]JNK3:  43%|████▎     | 20/46 [03:37<01:07,  2.59s/it]JNK3:  48%|████▊     | 22/46 [03:37<00:39,  1.66s/it]JNK3:  57%|█████▋    | 26/46 [03:37<00:16,  1.21it/s]JNK3:  61%|██████    | 28/46 [03:37<00:11,  1.61it/s]JNK3:  65%|██████▌   | 30/46 [03:38<00:07,  2.02it/s]JNK3:  70%|██████▉   | 32/46 [03:38<00:05,  2.68it/s]JNK3:  74%|███████▍  | 34/46 [03:38<00:03,  3.53it/s]JNK3:  78%|███████▊  | 36/46 [03:38<00:02,  4.17it/s]JNK3:  83%|████████▎ | 38/46 [03:39<00:01,  4.30it/s]JNK3:  85%|████████▍ | 39/46 [03:39<00:01,  3.63it/s]JNK3:  89%|████████▉ | 41/46 [03:39<00:01,  4.69it/s]JNK3:  91%|█████████▏| 42/46 [03:40<00:00,  4.21it/s]JNK3:  93%|█████████▎| 43/46 [03:40<00:00,  4.44it/s]JNK3:  96%|█████████▌| 44/46 [03:40<00:00,  4.44it/s]JNK3:  98%|█████████▊| 45/46 [03:40<00:00,  4.76it/s]JNK3: 100%|██████████| 46/46 [03:42<00:00,  1.97it/s]JNK3: 100%|██████████| 46/46 [03:42<00:00,  4.83s/it]
-Predicting GSK3B for 229018 molecules with 60 workers...
-GSK3B:   0%|          | 0/46 [00:00<?, ?it/s]Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-Found local copy...
-GSK3B:   2%|▏         | 1/46 [02:50<2:08:04, 170.76s/it]GSK3B:   9%|▊         | 4/46 [02:50<22:38, 32.34s/it]   GSK3B:  15%|█▌        | 7/46 [02:51<09:47, 15.07s/it]GSK3B:  22%|██▏       | 10/46 [02:51<05:07,  8.55s/it]GSK3B:  26%|██▌       | 12/46 [02:51<03:26,  6.08s/it]GSK3B:  30%|███       | 14/46 [02:52<02:20,  4.40s/it]GSK3B:  35%|███▍      | 16/46 [02:53<01:36,  3.22s/it]GSK3B:  37%|███▋      | 17/46 [03:13<02:59,  6.21s/it]GSK3B:  39%|███▉      | 18/46 [03:50<05:44, 12.30s/it]GSK3B:  41%|████▏     | 19/46 [03:52<04:32, 10.08s/it]GSK3B:  43%|████▎     | 20/46 [03:53<03:22,  7.80s/it]GSK3B:  46%|████▌     | 21/46 [03:53<02:26,  5.86s/it]GSK3B:  50%|█████     | 23/46 [03:53<01:18,  3.42s/it]GSK3B:  52%|█████▏    | 24/46 [03:53<00:58,  2.66s/it]GSK3B:  54%|█████▍    | 25/46 [03:53<00:42,  2.03s/it]GSK3B:  59%|█████▊    | 27/46 [03:54<00:23,  1.25s/it]GSK3B:  65%|██████▌   | 30/46 [03:54<00:11,  1.43it/s]GSK3B:  72%|███████▏  | 33/46 [03:54<00:05,  2.30it/s]GSK3B:  76%|███████▌  | 35/46 [03:54<00:03,  3.02it/s]GSK3B:  80%|████████  | 37/46 [03:55<00:02,  3.18it/s]GSK3B:  87%|████████▋ | 40/46 [03:55<00:01,  3.96it/s]GSK3B:  91%|█████████▏| 42/46 [03:56<00:01,  3.77it/s]GSK3B:  93%|█████████▎| 43/46 [03:56<00:00,  3.57it/s]GSK3B:  96%|█████████▌| 44/46 [03:57<00:00,  2.89it/s]GSK3B:  98%|█████████▊| 45/46 [03:58<00:00,  2.12it/s]GSK3B: 100%|██████████| 46/46 [03:58<00:00,  2.56it/s]GSK3B: 100%|██████████| 46/46 [03:58<00:00,  5.18s/it]
-
-JNK3 - Non-zero: 140733, Zero: 88285
-GSK3B - Non-zero: 168177, Zero: 60841
-
-Processing training data...
-Processing train: 0it [00:00, ?it/s]Processing train: 2834it [00:00, 28335.43it/s]Processing train: 5750it [00:00, 28813.59it/s]Processing train: 8657it [00:00, 28926.92it/s]Processing train: 11550it [00:00, 28895.78it/s]Processing train: 14445it [00:00, 28913.09it/s]Processing train: 17352it [00:00, 28965.64it/s]Processing train: 20252it [00:00, 28976.32it/s]Processing train: 23150it [00:00, 28818.96it/s]Processing train: 26056it [00:00, 28890.20it/s]Processing train: 28946it [00:01, 27086.37it/s]Processing train: 31836it [00:01, 27615.13it/s]Processing train: 34698it [00:01, 27909.10it/s]Processing train: 37596it [00:01, 28225.51it/s]Processing train: 40480it [00:01, 28405.64it/s]Processing train: 43328it [00:01, 27507.14it/s]Processing train: 46157it [00:01, 27732.98it/s]Processing train: 49030it [00:01, 28024.49it/s]Processing train: 51926it [00:01, 28300.35it/s]Processing train: 54828it [00:01, 28510.50it/s]Processing train: 57683it [00:02, 28381.08it/s]Processing train: 60524it [00:02, 28348.77it/s]Processing train: 63375it [00:02, 28392.30it/s]Processing train: 66250it [00:02, 28497.15it/s]Processing train: 69101it [00:02, 28470.15it/s]Processing train: 71966it [00:02, 28521.36it/s]Processing train: 74828it [00:02, 28548.51it/s]Processing train: 77684it [00:02, 28521.45it/s]Processing train: 80537it [00:02, 27656.09it/s]Processing train: 83309it [00:02, 27578.11it/s]Processing train: 86071it [00:03, 27551.88it/s]Processing train: 88829it [00:03, 22553.30it/s]Processing train: 91682it [00:03, 24087.53it/s]Processing train: 94568it [00:03, 25366.52it/s]Processing train: 97473it [00:03, 26386.60it/s]Processing train: 100355it [00:03, 27076.37it/s]Processing train: 103215it [00:03, 27514.13it/s]Processing train: 106089it [00:03, 27870.35it/s]Processing train: 108972it [00:03, 28151.28it/s]Processing train: 111869it [00:04, 28393.05it/s]Processing train: 114725it [00:04, 28355.33it/s]Processing train: 117623it [00:04, 28538.05it/s]Processing train: 120510it [00:04, 28634.86it/s]Processing train: 123384it [00:04, 28663.67it/s]Processing train: 126255it [00:04, 28627.57it/s]Processing train: 129134it [00:04, 28675.65it/s]Processing train: 132004it [00:04, 28639.66it/s]Processing train: 134882it [00:04, 28681.33it/s]Processing train: 137752it [00:04, 28601.74it/s]Processing train: 140641it [00:05, 28686.56it/s]Processing train: 143521it [00:05, 28717.20it/s]Processing train: 146423it [00:05, 28806.22it/s]Processing train: 149307it [00:05, 28814.60it/s]Processing train: 152189it [00:05, 28583.22it/s]Processing train: 155048it [00:05, 28258.20it/s]Processing train: 157936it [00:05, 28439.84it/s]Processing train: 160811it [00:05, 28530.25it/s]Processing train: 163694it [00:05, 28618.18it/s]Processing train: 166557it [00:05, 28541.11it/s]Processing train: 169412it [00:06, 28443.96it/s]Processing train: 172257it [00:06, 28304.22it/s]Processing train: 175088it [00:06, 28289.32it/s]Processing train: 177918it [00:06, 28219.13it/s]Processing train: 180744it [00:06, 28230.04it/s]Processing train: 183568it [00:06, 28219.40it/s]Processing train: 186437it [00:06, 28358.45it/s]Processing train: 189307it [00:06, 28457.68it/s]Processing train: 192163it [00:06, 28486.87it/s]Processing train: 195012it [00:06, 28463.05it/s]Processing train: 197867it [00:07, 28488.21it/s]Processing train: 200716it [00:07, 28281.01it/s]Processing train: 203545it [00:07, 28057.47it/s]Processing train: 206371it [00:07, 28116.30it/s]Processing train: 209223it [00:07, 28234.08it/s]Processing train: 212067it [00:07, 28292.76it/s]Processing train: 214897it [00:07, 28206.45it/s]Processing train: 217732it [00:07, 28248.32it/s]Processing train: 220582it [00:07, 28321.97it/s]Processing train: 223427it [00:07, 28358.94it/s]Processing train: 226264it [00:08, 28325.69it/s]Processing train: 229097it [00:08, 28259.54it/s]Processing train: 231924it [00:08, 28260.50it/s]Processing train: 234754it [00:08, 28271.12it/s]Processing train: 237584it [00:08, 28278.53it/s]Processing train: 240443it [00:08, 28371.06it/s]Processing train: 243303it [00:08, 28438.92it/s]Processing train: 246171it [00:08, 28509.66it/s]Processing train: 249022it [00:08, 28466.75it/s]Processing train: 251898it [00:08, 28552.86it/s]Processing train: 254761it [00:09, 28572.98it/s]Processing train: 257639it [00:09, 28633.39it/s]Processing train: 260503it [00:09, 28548.16it/s]Processing train: 263362it [00:09, 28558.04it/s]Processing train: 266218it [00:09, 28531.66it/s]Processing train: 269072it [00:09, 28442.25it/s]Processing train: 271917it [00:09, 28305.59it/s]Processing train: 274751it [00:09, 28314.37it/s]Processing train: 277583it [00:09, 28245.35it/s]Processing train: 280408it [00:09, 28206.88it/s]Processing train: 283265it [00:10, 28313.67it/s]Processing train: 286146it [00:10, 28461.39it/s]Processing train: 289025it [00:10, 28556.59it/s]Processing train: 291916it [00:10, 28658.87it/s]Processing train: 294782it [00:10, 28632.20it/s]Processing train: 297646it [00:10, 28558.55it/s]Processing train: 300502it [00:10, 28531.85it/s]Processing train: 303356it [00:10, 28526.50it/s]Processing train: 306209it [00:10, 28465.79it/s]Processing train: 309070it [00:10, 28508.32it/s]Processing train: 311921it [00:11, 28497.16it/s]Processing train: 314771it [00:11, 28482.03it/s]Processing train: 317620it [00:11, 28316.31it/s]Processing train: 320452it [00:11, 28166.36it/s]Processing train: 323301it [00:11, 28262.32it/s]Processing train: 326142it [00:11, 28303.92it/s]Processing train: 328973it [00:11, 28235.93it/s]Processing train: 331833it [00:11, 28342.95it/s]Processing train: 334683it [00:11, 28386.28it/s]Processing train: 337522it [00:11, 28379.51it/s]Processing train: 340361it [00:12, 28304.55it/s]Processing train: 343203it [00:12, 28337.55it/s]Processing train: 346039it [00:12, 28341.42it/s]Processing train: 348880it [00:12, 28359.28it/s]Processing train: 351716it [00:12, 28282.87it/s]Processing train: 354572it [00:12, 28365.32it/s]Processing train: 357409it [00:12, 28359.30it/s]Processing train: 360245it [00:12, 28329.80it/s]Processing train: 363079it [00:12, 28287.86it/s]Processing train: 365942it [00:12, 28388.14it/s]Processing train: 368781it [00:13, 28353.24it/s]Processing train: 371617it [00:13, 28143.92it/s]Processing train: 374452it [00:13, 28204.98it/s]Processing train: 377273it [00:13, 28136.76it/s]Processing train: 380087it [00:13, 28095.23it/s]Processing train: 382897it [00:13, 27905.47it/s]Processing train: 385688it [00:13, 27896.55it/s]Processing train: 388478it [00:13, 27855.95it/s]Processing train: 391265it [00:13, 27859.76it/s]Processing train: 394052it [00:13, 27346.48it/s]Processing train: 396863it [00:14, 27570.78it/s]Processing train: 399666it [00:14, 27704.44it/s]Processing train: 402493it [00:14, 27870.91it/s]Processing train: 405311it [00:14, 27961.01it/s]Processing train: 408138it [00:14, 28048.94it/s]Processing train: 410982it [00:14, 28163.16it/s]Processing train: 413811it [00:14, 28198.32it/s]Processing train: 416632it [00:14, 28177.42it/s]Processing train: 419450it [00:14, 28160.46it/s]Processing train: 422291it [00:14, 28232.91it/s]Processing train: 425115it [00:15, 26903.27it/s]Processing train: 427927it [00:15, 27253.93it/s]Processing train: 430754it [00:15, 27550.51it/s]Processing train: 433581it [00:15, 27762.40it/s]Processing train: 436431it [00:15, 27978.94it/s]Processing train: 439234it [00:15, 27945.66it/s]Processing train: 442067it [00:15, 28057.01it/s]Processing train: 444875it [00:15, 27037.73it/s]Processing train: 447588it [00:15, 27053.39it/s]Processing train: 450300it [00:16, 27017.67it/s]Processing train: 453007it [00:16, 26316.89it/s]Processing train: 455827it [00:16, 26863.37it/s]Processing train: 458672it [00:16, 27327.88it/s]Processing train: 461458it [00:16, 27483.16it/s]Processing train: 464300it [00:16, 27759.39it/s]Processing train: 467150it [00:16, 27978.83it/s]Processing train: 470006it [00:16, 28151.13it/s]Processing train: 472861it [00:16, 28267.37it/s]Processing train: 475712it [00:16, 28338.54it/s]Processing train: 478547it [00:17, 28310.89it/s]Processing train: 481379it [00:17, 27362.26it/s]Processing train: 484123it [00:17, 23922.20it/s]Processing train: 486940it [00:17, 25056.78it/s]Processing train: 489778it [00:17, 25973.45it/s]Processing train: 492635it [00:17, 26707.09it/s]Processing train: 495441it [00:17, 27093.80it/s]Processing train: 498276it [00:17, 27458.27it/s]Processing train: 501103it [00:17, 27695.41it/s]Processing train: 503927it [00:17, 27854.75it/s]Processing train: 506762it [00:18, 28000.63it/s]Processing train: 509614it [00:18, 28154.42it/s]Processing train: 512474it [00:18, 28286.10it/s]Processing train: 515307it [00:18, 27003.52it/s]Processing train: 518192it [00:18, 27536.43it/s]Processing train: 521062it [00:18, 27873.04it/s]Processing train: 523932it [00:18, 28115.55it/s]Processing train: 526778it [00:18, 28217.34it/s]Processing train: 529645it [00:18, 28349.83it/s]Processing train: 532506it [00:18, 28425.91it/s]Processing train: 535365it [00:19, 28473.39it/s]Processing train: 538234it [00:19, 28537.63it/s]Processing train: 541129it [00:19, 28659.34it/s]Processing train: 544042it [00:19, 28796.97it/s]Processing train: 546923it [00:19, 27174.70it/s]Processing train: 549660it [00:19, 27005.04it/s]Processing train: 552570it [00:19, 27610.32it/s]Processing train: 555441it [00:19, 27929.12it/s]Processing train: 558347it [00:19, 28261.64it/s]Processing train: 561180it [00:20, 27846.12it/s]Processing train: 564030it [00:20, 28037.93it/s]Processing train: 566898it [00:20, 28226.01it/s]Processing train: 569752it [00:20, 28316.94it/s]Processing train: 572603it [00:20, 28373.10it/s]Processing train: 575487it [00:20, 28510.82it/s]Processing train: 578347it [00:20, 28537.04it/s]Processing train: 581202it [00:20, 28454.05it/s]Processing train: 584050it [00:20, 28458.63it/s]Processing train: 586901it [00:20, 28473.32it/s]Processing train: 589755it [00:21, 28491.42it/s]Processing train: 592605it [00:21, 28388.04it/s]Processing train: 595445it [00:21, 28133.21it/s]Processing train: 598259it [00:21, 27968.00it/s]Processing train: 601057it [00:21, 26457.84it/s]Processing train: 603719it [00:21, 25162.60it/s]Processing train: 606256it [00:21, 23794.07it/s]Processing train: 609046it [00:21, 24915.59it/s]Processing train: 611846it [00:21, 25779.84it/s]Processing train: 614627it [00:21, 26360.30it/s]Processing train: 617450it [00:22, 26900.76it/s]Processing train: 620268it [00:22, 27275.55it/s]Processing train: 623049it [00:22, 27432.54it/s]Processing train: 625801it [00:22, 27322.92it/s]Processing train: 628619it [00:22, 27574.52it/s]Processing train: 631381it [00:22, 27472.11it/s]Processing train: 634132it [00:22, 27328.29it/s]Processing train: 636979it [00:22, 27664.62it/s]Processing train: 639846it [00:22, 27962.86it/s]Processing train: 642720it [00:22, 28193.08it/s]Processing train: 645600it [00:23, 28371.55it/s]Processing train: 648453it [00:23, 28418.63it/s]Processing train: 651296it [00:23, 27400.96it/s]Processing train: 654169it [00:23, 27788.03it/s]Processing train: 657030it [00:23, 28029.02it/s]Processing train: 659839it [00:23, 26515.14it/s]Processing train: 662510it [00:23, 23720.19it/s]Processing train: 664944it [00:23, 22334.83it/s]Processing train: 667804it [00:23, 23980.76it/s]Processing train: 670668it [00:24, 25251.77it/s]Processing train: 673545it [00:24, 26238.05it/s]Processing train: 676382it [00:24, 26847.77it/s]Processing train: 679214it [00:24, 27272.70it/s]Processing train: 682031it [00:24, 27531.77it/s]Processing train: 684878it [00:24, 27805.49it/s]Processing train: 687735it [00:24, 28030.21it/s]Processing train: 690592it [00:24, 28187.76it/s]Processing train: 693418it [00:24, 28172.83it/s]Processing train: 696241it [00:24, 28169.64it/s]Processing train: 699062it [00:25, 28166.56it/s]Processing train: 701907it [00:25, 28248.37it/s]Processing train: 704734it [00:25, 27968.17it/s]Processing train: 707537it [00:25, 27984.94it/s]Processing train: 710337it [00:25, 27946.51it/s]Processing train: 713177it [00:25, 28079.73it/s]Processing train: 715992it [00:25, 28098.94it/s]Processing train: 718803it [00:25, 28071.34it/s]Processing train: 721665it [00:25, 28233.81it/s]Processing train: 724489it [00:26, 28213.13it/s]Processing train: 727353it [00:26, 28338.53it/s]Processing train: 730238it [00:26, 28489.73it/s]Processing train: 733088it [00:26, 26301.93it/s]Processing train: 735939it [00:26, 26925.86it/s]Processing train: 738790it [00:26, 27381.82it/s]Processing train: 741658it [00:26, 27759.05it/s]Processing train: 744529it [00:26, 28034.81it/s]Processing train: 747397it [00:26, 28223.37it/s]Processing train: 750228it [00:26, 28163.65it/s]Processing train: 753086it [00:27, 28285.28it/s]Processing train: 755936it [00:27, 28348.97it/s]Processing train: 758791it [00:27, 28408.00it/s]Processing train: 761634it [00:27, 27679.53it/s]Processing train: 764408it [00:27, 27397.39it/s]Processing train: 767152it [00:27, 27135.96it/s]Processing train: 770049it [00:27, 27670.92it/s]Processing train: 772879it [00:27, 27853.71it/s]Processing train: 775718it [00:27, 28012.52it/s]Processing train: 778522it [00:27, 28008.40it/s]Processing train: 781325it [00:28, 22759.39it/s]Processing train: 783761it [00:28, 20624.46it/s]Processing train: 786495it [00:28, 22276.52it/s]Processing train: 789196it [00:28, 23506.54it/s]Processing train: 791658it [00:28, 22581.67it/s]Processing train: 794459it [00:28, 24038.27it/s]Processing train: 797298it [00:28, 25243.46it/s]Processing train: 800053it [00:28, 25894.89it/s]Processing train: 802689it [00:28, 25965.51it/s]Processing train: 805558it [00:29, 26758.37it/s]Processing train: 808410it [00:29, 27272.56it/s]Processing train: 811268it [00:29, 27656.16it/s]Processing train: 814104it [00:29, 27863.63it/s]Processing train: 816917it [00:29, 27942.25it/s]Processing train: 819773it [00:29, 28124.89it/s]Processing train: 822652it [00:29, 28321.75it/s]Processing train: 825488it [00:29, 27402.61it/s]Processing train: 828363it [00:29, 27795.74it/s]Processing train: 831309it [00:30, 28285.07it/s]Processing train: 834250it [00:30, 28616.41it/s]Processing train: 837178it [00:30, 28812.91it/s]Processing train: 840130it [00:30, 29021.05it/s]Processing train: 843063it [00:30, 29111.96it/s]Processing train: 846000it [00:30, 29188.62it/s]Processing train: 848921it [00:30, 29103.64it/s]Processing train: 851836it [00:30, 29115.88it/s]Processing train: 854754it [00:30, 29132.83it/s]Processing train: 857668it [00:30, 29105.05it/s]Processing train: 860615it [00:31, 29212.65it/s]Processing train: 863451it [00:31, 27759.62it/s]
-Saved training data to all_data/train_5props.jsonl
-
-Calculating property medians...
-Property medians: {'jnk3': nan, 'gsk3b': 0.0, 'drd2': 0.02, 'plogp': 0.69, 'qed': 0.7}
-
-Generated 31 combination tasks
-
-Processing test data...
-Adding JNK3 and GSK3B to test molecules...
-  0%|          | 0/7116 [00:00<?, ?it/s]100%|██████████| 7116/7116 [00:00<00:00, 565770.70it/s]
-Generating test tasks:   0%|          | 0/31 [00:00<?, ?it/s]Generating test tasks:  13%|█▎        | 4/31 [00:00<00:01, 17.84it/s]Generating test tasks:  26%|██▌       | 8/31 [00:00<00:00, 23.17it/s]Generating test tasks:  48%|████▊     | 15/31 [00:00<00:00, 37.03it/s]Generating test tasks:  65%|██████▍   | 20/31 [00:00<00:00, 30.27it/s]Generating test tasks:  84%|████████▍ | 26/31 [00:00<00:00, 36.69it/s]Generating test tasks: 100%|██████████| 31/31 [00:00<00:00, 35.70it/s]Generating test tasks: 100%|██████████| 31/31 [00:00<00:00, 32.77it/s]
-Saved 7500 test samples to all_data/test_5props.json
-
-Test samples per task:
-  jnk3: 500
-  gsk3b: 0
-  drd2: 500
-  plogp: 500
-  qed: 500
-  jnk3+gsk3b: 0
-  jnk3+drd2: 500
-  jnk3+plogp: 500
-  jnk3+qed: 500
-  gsk3b+drd2: 0
-  gsk3b+plogp: 0
-  gsk3b+qed: 0
-  drd2+plogp: 500
-  drd2+qed: 500
-  plogp+qed: 500
-  jnk3+gsk3b+drd2: 0
-  jnk3+gsk3b+plogp: 0
-  jnk3+gsk3b+qed: 0
-  jnk3+drd2+plogp: 500
-  jnk3+drd2+qed: 500
-  jnk3+plogp+qed: 500
-  gsk3b+drd2+plogp: 0
-  gsk3b+drd2+qed: 0
-  gsk3b+plogp+qed: 0
-  drd2+plogp+qed: 500
-  jnk3+gsk3b+drd2+plogp: 0
-  jnk3+gsk3b+drd2+qed: 0
-  jnk3+gsk3b+plogp+qed: 0
-  jnk3+drd2+plogp+qed: 500
-  gsk3b+drd2+plogp+qed: 0
-  jnk3+gsk3b+drd2+plogp+qed: 0

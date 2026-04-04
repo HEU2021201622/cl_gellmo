@@ -1,1 +1,0 @@
-from properties import drd2, qed, penalized_logp, similarity
