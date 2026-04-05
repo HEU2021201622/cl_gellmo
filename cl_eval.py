@@ -229,7 +229,13 @@ def percentage_improvement(source_value: float, candidate_value: float) -> float
     return abs(candidate_value - source_value) / abs(source_value)
 
 
-def choose_best_candidate(source_props: Dict[str, float], candidate_values: Dict[str, Dict[str, float]], task_props: Sequence[str]):
+def choose_best_candidate(
+    source_props: Dict[str, float],
+    candidate_values: Dict[str, Dict[str, float]],
+    task_props: Sequence[str],
+    *,
+    use_thresholds: bool,
+):
     best = None
     best_score = -float("inf")
     for smiles, prop_values in candidate_values.items():
@@ -239,7 +245,10 @@ def choose_best_candidate(source_props: Dict[str, float], candidate_values: Dict
             source_value = source_props[prop]
             candidate_value = prop_values[prop]
             delta = candidate_improvement(source_value, candidate_value, prop)
-            if delta < property_threshold(prop):
+            if delta <= 0:
+                success = False
+                break
+            if use_thresholds and delta < property_threshold(prop):
                 success = False
                 break
             improvements.append(percentage_improvement(source_value, candidate_value))
@@ -298,6 +307,9 @@ def evaluate_task(job: Dict, test_lookup: Dict, seen_smiles: set, config: Dict) 
     successful_ri = []
     successful_sas = []
     successful_unseen = 0
+    successful_smiles_dir = []
+    successful_input_sims_dir = []
+    successful_ri_dir = []
     unique_valid_occurrences = 0
     total_valid_occurrences = 0
     candidate_vectors = []
@@ -336,7 +348,14 @@ def evaluate_task(job: Dict, test_lookup: Dict, seen_smiles: set, config: Dict) 
             num_valid_inputs += 1
             unique_valid_occurrences += len(set(candidate_values.keys()))
 
-        best_candidate = choose_best_candidate(source_props, candidate_values, task_props)
+        best_candidate_dir = choose_best_candidate(source_props, candidate_values, task_props, use_thresholds=False)
+        if best_candidate_dir is not None:
+            smiles_dir, _, improvements_dir = best_candidate_dir
+            successful_smiles_dir.append(smiles_dir)
+            successful_input_sims_dir.append(pair_similarity(source_smiles, smiles_dir))
+            successful_ri_dir.append(composite_score(improvements_dir))
+
+        best_candidate = choose_best_candidate(source_props, candidate_values, task_props, use_thresholds=True)
         if best_candidate is None:
             continue
 
@@ -376,8 +395,11 @@ def evaluate_task(job: Dict, test_lookup: Dict, seen_smiles: set, config: Dict) 
         "split_type": job["setting"],
         "task_order": len(task_props),
         "SR": sr,
+        "SR_dir": (len(successful_smiles_dir) / num_inputs) * 100 if num_inputs else 0.0,
         "Sim": safe_mean(successful_input_sims),
+        "Sim_dir": safe_mean(successful_input_sims_dir),
         "RI": safe_mean(successful_ri),
+        "RI_dir": safe_mean(successful_ri_dir),
         "Validity": validity,
         "Novelty": novelty,
         "Uniqueness": uniqueness,

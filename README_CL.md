@@ -223,6 +223,13 @@ Files per evaluation root:
 - `best_candidates.jsonl`
 - `eval_manifest.json`
 
+Evaluation now reports two success-rate styles:
+
+- `SR`
+  - thresholded CL success rate using the configured property-improvement thresholds
+- `SR_dir`
+  - direction-only success rate following the original GeLLMO notebook style
+
 ## CL Inference
 
 The CL inference path keeps the original GeLLMO prompt style:
