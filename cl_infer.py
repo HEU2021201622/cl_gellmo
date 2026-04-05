@@ -197,13 +197,18 @@ def load_generation_stack(base_model: str, adapter_dir: str, *, load_in_8bit: bo
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)
 
+    eos_token_id = model.config.eos_token_id or tokenizer.eos_token_id
+    if isinstance(eos_token_id, list):
+        eos_token_id = eos_token_id[0]
+
     if not model.config.eos_token_id:
-        tokenizer.pad_token_id = tokenizer.eos_token_id
+        tokenizer.pad_token_id = eos_token_id
         tokenizer.padding_side = "left"
-        model.config.eos_token_id = tokenizer.eos_token_id
+        model.config.eos_token_id = eos_token_id
     else:
-        tokenizer.pad_token_id = model.config.eos_token_id
+        tokenizer.pad_token_id = eos_token_id
         tokenizer.padding_side = "left"
+    model.config.pad_token_id = tokenizer.pad_token_id
 
     generator = pipeline(
         "text-generation",
@@ -212,6 +217,10 @@ def load_generation_stack(base_model: str, adapter_dir: str, *, load_in_8bit: bo
         torch_dtype=torch.float16,
         device_map="auto",
     )
+    # `pipeline` batching requires a concrete pad token id. Some Llama configs expose
+    # eos_token_id as a list, so normalize it and set it explicitly on the pipeline tokenizer.
+    generator.tokenizer.pad_token_id = tokenizer.pad_token_id
+    generator.model.config.pad_token_id = tokenizer.pad_token_id
     return generator, tokenizer
 
 
