@@ -1,4 +1,5 @@
 import argparse
+import gc
 import json
 import os
 import sys
@@ -221,7 +222,30 @@ def load_generation_stack(base_model: str, adapter_dir: str, *, load_in_8bit: bo
     # eos_token_id as a list, so normalize it and set it explicitly on the pipeline tokenizer.
     generator.tokenizer.pad_token_id = tokenizer.pad_token_id
     generator.model.config.pad_token_id = tokenizer.pad_token_id
+    if hasattr(generator.model, "generation_config"):
+        generator.model.generation_config.top_p = None
     return generator, tokenizer
+
+
+def release_generation_stack(generator, tokenizer) -> None:
+    if generator is not None:
+        model = getattr(generator, "model", None)
+        if model is not None:
+            del model
+        del generator
+    if tokenizer is not None:
+        del tokenizer
+
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            if hasattr(torch.cuda, "ipc_collect"):
+                torch.cuda.ipc_collect()
+    except Exception:
+        pass
+    gc.collect()
 
 
 def generate_predictions(
@@ -305,59 +329,62 @@ def main():
         prompter = Prompter(run["opt_type"], response_split, template_path="templates")
         generator = None
         tokenizer = None
-        if not args.dry_run:
-            generator, tokenizer = load_generation_stack(
-                run["base_model"],
-                run["checkpoint_dir"],
-                load_in_8bit=config["load_in_8bit"],
-            )
-
-        for setting in config["settings"]:
-            for task in run["infer_tasks"]:
-                task_records = filter_test_records(all_records, tasks=[task], instr_setting=setting)
-                validate_records(
-                    task_records,
-                    task=task,
-                    setting=setting,
-                    allow_non_500=config["allow_non_500"],
+        try:
+            if not args.dry_run:
+                generator, tokenizer = load_generation_stack(
+                    run["base_model"],
+                    run["checkpoint_dir"],
+                    load_in_8bit=config["load_in_8bit"],
                 )
-                prompts = build_prompts(task_records, prompter=prompter, opt_type=run["opt_type"], setting=setting)
-                responses = [[] for _ in task_records]
-                if not args.dry_run:
-                    responses = generate_predictions(
-                        prompts=prompts,
-                        prompter=prompter,
-                        generator=generator,
-                        tokenizer=tokenizer,
-                        batch_size=config["batch_size"],
-                        num_beams=config["num_beams"],
-                        num_return_sequences=config["num_return_sequences"],
+
+            for setting in config["settings"]:
+                for task in run["infer_tasks"]:
+                    task_records = filter_test_records(all_records, tasks=[task], instr_setting=setting)
+                    validate_records(
+                        task_records,
+                        task=task,
+                        setting=setting,
+                        allow_non_500=config["allow_non_500"],
                     )
+                    prompts = build_prompts(task_records, prompter=prompter, opt_type=run["opt_type"], setting=setting)
+                    responses = [[] for _ in task_records]
+                    if not args.dry_run:
+                        responses = generate_predictions(
+                            prompts=prompts,
+                            prompter=prompter,
+                            generator=generator,
+                            tokenizer=tokenizer,
+                            batch_size=config["batch_size"],
+                            num_beams=config["num_beams"],
+                            num_return_sequences=config["num_return_sequences"],
+                        )
 
-                payload = build_prediction_records(
-                    records=task_records,
-                    prompts=prompts,
-                    responses=responses,
-                    task=task,
-                    setting=setting,
-                    run=run,
-                )
-                output_dir = build_output_dir(config, run, task, setting)
-                manifest = {
-                    "mode": run["mode"],
-                    "method_or_joint": run["method_or_joint"],
-                    "step_or_all": run["run_name"],
-                    "task": task,
-                    "split_type": setting,
-                    "base_model": run["base_model"],
-                    "adapter_dir": run["checkpoint_dir"],
-                    "num_beams": config["num_beams"],
-                    "num_return_sequences": config["num_return_sequences"],
-                    "record_count": len(payload),
-                    "dry_run": bool(args.dry_run),
-                }
-                write_prediction_outputs(output_dir, payload, manifest)
-                print(f"[{'dry-run' if args.dry_run else 'infer'}] wrote {len(payload)} records to {output_dir}")
+                    payload = build_prediction_records(
+                        records=task_records,
+                        prompts=prompts,
+                        responses=responses,
+                        task=task,
+                        setting=setting,
+                        run=run,
+                    )
+                    output_dir = build_output_dir(config, run, task, setting)
+                    manifest = {
+                        "mode": run["mode"],
+                        "method_or_joint": run["method_or_joint"],
+                        "step_or_all": run["run_name"],
+                        "task": task,
+                        "split_type": setting,
+                        "base_model": run["base_model"],
+                        "adapter_dir": run["checkpoint_dir"],
+                        "num_beams": config["num_beams"],
+                        "num_return_sequences": config["num_return_sequences"],
+                        "record_count": len(payload),
+                        "dry_run": bool(args.dry_run),
+                    }
+                    write_prediction_outputs(output_dir, payload, manifest)
+                    print(f"[{'dry-run' if args.dry_run else 'infer'}] wrote {len(payload)} records to {output_dir}")
+        finally:
+            release_generation_stack(generator, tokenizer)
 
 
 if __name__ == "__main__":
