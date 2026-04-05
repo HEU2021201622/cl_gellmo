@@ -13,6 +13,7 @@ from config import PROPERTY_ALIASES
 FIELD_ALIASES = {
     "source_smiles": ["source_smiles", "source", "src_smiles", "input_smiles"],
     "target_smiles": ["target_smiles", "target", "tgt_smiles", "output_smiles"],
+    "source_id": ["source_id", "id", "molecule_id", "mol_id", "sample_id"],
     "task": ["task", "task_label", "task_name"],
     "instruction": ["instruction", "prompt", "input_text"],
     "instr_idx": ["instr_idx", "instruction_idx"],
@@ -56,6 +57,7 @@ def normalize_record(record: Dict) -> Dict:
     normalized = {
         "source_smiles": _pick_value(record, "source_smiles", ""),
         "target_smiles": _pick_value(record, "target_smiles", ""),
+        "source_id": _pick_value(record, "source_id"),
         "task": normalize_task_name(_pick_value(record, "task", "")),
         "instruction": _pick_value(record, "instruction"),
         "instr_idx": _pick_value(record, "instr_idx", 0),
@@ -148,6 +150,22 @@ def filter_records(records: Sequence[Dict], split: str, tasks: Sequence[str]) ->
         record
         for record in records
         if record.get("split") == split and normalize_task_name(record.get("task", "")) in normalized_tasks
+    ]
+
+
+def filter_test_records(
+    records: Sequence[Dict],
+    *,
+    tasks: Sequence[str],
+    instr_setting: str,
+) -> List[Dict]:
+    normalized_tasks = {normalize_task_name(task) for task in tasks}
+    return [
+        record
+        for record in records
+        if record.get("split") == "test"
+        and normalize_task_name(record.get("task", "")) in normalized_tasks
+        and record.get("instr_setting", "seen") == instr_setting
     ]
 
 

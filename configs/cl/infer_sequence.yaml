@@ -1,0 +1,17 @@
+mode: sequence
+method: naive_sequence
+data_root: data
+test_file: all_data/test.json
+settings: [seen]
+num_beams: 20
+num_return_sequences: 20
+batch_size: 16
+steps:
+  step1:
+    infer_tasks: [drd2]
+  step2:
+    infer_tasks: [qed]
+  step3:
+    infer_tasks: [plogp]
+  step4:
+    infer_tasks: [jnk3]

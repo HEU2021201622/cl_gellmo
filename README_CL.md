@@ -9,7 +9,7 @@ This repository extends the original GeLLMO training style with a continuous-lea
 - Mistral-7B-Instruct-v0.3 + LoRA
 - original `train.sh` / `trainer.py` path kept intact
 
-The new code currently focuses on training only. Inference and evaluation for CL are not implemented yet, but the output structure was designed so later stages can reuse it directly.
+The new code now covers CL training and CL inference. Evaluation is still kept separate.
 
 ## What Was Added
 
@@ -38,6 +38,8 @@ The new code currently focuses on training only. Inference and evaluation for CL
 - `bash/cl/train_naive_sequence.sh`
 - `bash/cl/train_replay.sh`
 - `bash/cl/train_joint_all.sh`
+- `bash/cl/infer_sequence.sh`
+- `bash/cl/infer_joint.sh`
 
 ### Modified existing files
 
@@ -46,6 +48,15 @@ The new code currently focuses on training only. Inference and evaluation for CL
   - added reusable `train_on_records()` for CL
 - `config.py`
   - added CL property aliases and defaults
+- `cl_data.py`
+  - now also supports normalized test-set filtering for CL inference
+
+### New inference-side CL files
+
+- `cl_infer.py`
+  - main CL inference entrypoint
+- `configs/cl/infer_sequence.yaml`
+- `configs/cl/infer_joint.yaml`
 
 ## CL Experiment Definition
 
@@ -161,6 +172,63 @@ Checkpoint policy:
 - at most 2 intermediate checkpoints are kept
 - the step root directory is always kept as the final output
 
+Inference outputs:
+
+- `outputs/cl_infer/sequence/{method}/step{n}/{task}/{seen_or_unseen}/`
+- `outputs/cl_infer/joint/{joint_name}/{run_name}/{task}/{seen_or_unseen}/`
+
+Files per inference leaf directory:
+
+- `predictions.json`
+- `predictions.jsonl`
+- `infer_manifest.json`
+
+Each prediction record contains:
+
+- `prompt`
+- `response`
+- `task`
+- `split_type`
+- `checkpoint_id`
+- `checkpoint_dir`
+- `source_smiles`
+
+`response` is always a list and only contains model generations, never the prompt itself.
+
+## CL Inference
+
+The CL inference path keeps the original GeLLMO prompt style:
+
+- instruction-style prompts
+- 0-shot
+- beam search
+- `num_beams=20`
+- multiple candidates per input molecule
+
+The current default test condition is:
+
+- `seen`
+
+### Sequence vs Joint loading
+
+`sequence` mode:
+
+- reads one adapter per step from `outputs/cl_train/{method}/step{n}`
+- each step can infer any configured task list through `infer_tasks`
+- tasks are not hard-coded in Python
+
+`joint` mode:
+
+- reads one adapter per configured run from `outputs/cl_train/{joint_name}/{run_name}`
+- each run can infer any configured task list through `infer_tasks`
+
+The important design choice is:
+
+- training manifest describes what a checkpoint is
+- inference config describes what tasks to test with that checkpoint
+
+So later you can change task combinations only by editing YAML.
+
 ## Validation Status
 
 ### Confirmed on CPU
@@ -240,6 +308,47 @@ or
 
 ```bash
 python cl_train.py --config configs/cl/joint_all.yaml
+```
+
+### Sequence inference
+
+```bash
+bash bash/cl/infer_sequence.sh
+```
+
+or
+
+```bash
+python cl_infer.py --config configs/cl/infer_sequence.yaml
+```
+
+Example with a different sequence method:
+
+```bash
+python cl_infer.py \
+  --config configs/cl/infer_sequence.yaml \
+  --method replay \
+  --output-root outputs/cl_infer/sequence/replay
+```
+
+### Joint inference
+
+```bash
+bash bash/cl/infer_joint.sh
+```
+
+or
+
+```bash
+python cl_infer.py --config configs/cl/infer_joint.yaml
+```
+
+### Dry-run inference
+
+This resolves checkpoints, tasks, prompts, and output files without loading the model:
+
+```bash
+python cl_infer.py --config configs/cl/infer_sequence.yaml --dry-run
 ```
 
 ### Useful overrides

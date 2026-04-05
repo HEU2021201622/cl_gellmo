@@ -1,0 +1,11 @@
+mode: joint
+joint_name: joint_all
+data_root: data
+test_file: all_data/test.json
+settings: [seen]
+num_beams: 20
+num_return_sequences: 20
+batch_size: 16
+runs:
+  all:
+    infer_tasks: [drd2, qed, plogp, jnk3]

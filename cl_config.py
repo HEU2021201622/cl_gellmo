@@ -84,6 +84,45 @@ def load_cl_config(config_path: str) -> Dict[str, Any]:
     return config
 
 
+def load_cl_infer_config(config_path: str) -> Dict[str, Any]:
+    config_file = Path(config_path)
+    config = load_yaml(str(config_file))
+
+    base_config_path = config.get("base_config")
+    if base_config_path:
+        base_file = (config_file.parent / base_config_path).resolve()
+        base_config = load_yaml(str(base_file))
+        config = _deep_merge(base_config, config)
+
+    config.setdefault("base_model", None)
+    config.setdefault("prompt_template_name", None)
+    config.setdefault("opt_type", None)
+    config.setdefault("data_root", "data")
+    config.setdefault("test_file", "all_data/test.json")
+    config.setdefault("settings", ["seen"])
+    config.setdefault("num_beams", 20)
+    config.setdefault("num_return_sequences", 20)
+    config.setdefault("batch_size", 16)
+    config.setdefault("load_in_8bit", False)
+    config.setdefault("allow_non_500", False)
+
+    mode = config.get("mode")
+    if mode == "sequence":
+        config.setdefault("method", "naive_sequence")
+        steps = config.get("steps") or {}
+        if not steps:
+            raise ValueError("sequence infer config must define `steps`.")
+    elif mode == "joint":
+        config.setdefault("joint_name", "joint_all")
+        runs = config.get("runs") or {}
+        if not runs:
+            raise ValueError("joint infer config must define `runs`.")
+    else:
+        raise ValueError("Infer config must define `mode` as `sequence` or `joint`.")
+
+    return config
+
+
 def iter_step_names(config: Dict[str, Any]) -> Iterable[str]:
     if config["method"] == "joint_all":
         return ["all"]

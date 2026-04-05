@@ -72,6 +72,35 @@ class LoadBestPeftModelCallback(TrainerCallback):
         return control
 
 
+def _resolve_adapter_weight_path(adapter_dir: str) -> str:
+    candidate_paths = [
+        os.path.join(adapter_dir, "adapter_model.safetensors"),
+        os.path.join(adapter_dir, "adapter_model.bin"),
+    ]
+    resolved = next((path for path in candidate_paths if os.path.exists(path)), None)
+    if resolved is None:
+        raise FileNotFoundError(f"No adapter weights found in {adapter_dir}")
+    return resolved
+
+
+def _load_adapter_weights_into_default_adapter(model, adapter_dir: str) -> None:
+    adapter_weight_path = _resolve_adapter_weight_path(adapter_dir)
+    if adapter_weight_path.endswith(".safetensors"):
+        adapter_weights = safetensors.torch.load_file(adapter_weight_path)
+    else:
+        adapter_weights = torch.load(adapter_weight_path, weights_only=True)
+    set_peft_model_state_dict(model, adapter_weights)
+
+
+def _resolve_trainer_resume_checkpoint(resume_from_checkpoint: Optional[str]) -> Optional[str]:
+    if not resume_from_checkpoint:
+        return None
+    checkpoint_path = Path(resume_from_checkpoint)
+    if checkpoint_path.name.startswith(f"{PREFIX_CHECKPOINT_DIR}-"):
+        return resume_from_checkpoint
+    return None
+
+
 def _build_training_args(
     *,
     has_val: bool,
@@ -342,11 +371,15 @@ def train_on_records(
     )
     model = get_peft_model(model, config)
 
+    trainer_resume_checkpoint = _resolve_trainer_resume_checkpoint(resume_from_checkpoint)
     if lora_weight_path:
-        model.load_adapter(lora_weight_path, adapter_name="default")
-    if resume_from_checkpoint:
-        print(f"Resuming from checkpoint: {resume_from_checkpoint}")
-        model.load_adapter(resume_from_checkpoint, adapter_name="default")
+        print(f"Initializing adapter weights from: {lora_weight_path}")
+        _load_adapter_weights_into_default_adapter(model, lora_weight_path)
+    if resume_from_checkpoint and trainer_resume_checkpoint is None:
+        print(f"Initializing adapter weights from previous step: {resume_from_checkpoint}")
+        _load_adapter_weights_into_default_adapter(model, resume_from_checkpoint)
+    elif trainer_resume_checkpoint:
+        print(f"Resuming trainer state from checkpoint: {trainer_resume_checkpoint}")
 
     model.print_trainable_parameters()
 
@@ -399,7 +432,7 @@ def train_on_records(
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)
 
-    trainer.train(resume_from_checkpoint=resume_from_checkpoint)
+    trainer.train(resume_from_checkpoint=trainer_resume_checkpoint)
 
     model.save_pretrained(output_dir)
     pytorch_model_path = os.path.join(output_dir, "pytorch_model.bin")

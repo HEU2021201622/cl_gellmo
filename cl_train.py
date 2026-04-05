@@ -118,6 +118,7 @@ def train_step(
         "val_count": len(val_df),
         **manifest_extra,
     }
+    manifest.setdefault("trained_tasks", sorted({record["task"] for record in dataframe_records(train_df)}))
     write_json(str(Path(step_dir) / "train_manifest.json"), manifest)
 
     if dry_run:
