@@ -9,7 +9,7 @@ This repository extends the original GeLLMO training style with a continuous-lea
 - Mistral-7B-Instruct-v0.3 + LoRA
 - original `train.sh` / `trainer.py` path kept intact
 
-The new code now covers CL training and CL inference. Evaluation is still kept separate.
+The new code now covers CL training, CL inference, and CL evaluation.
 
 ## What Was Added
 
@@ -40,6 +40,10 @@ The new code now covers CL training and CL inference. Evaluation is still kept s
 - `bash/cl/train_joint_all.sh`
 - `bash/cl/infer_sequence.sh`
 - `bash/cl/infer_joint.sh`
+- `bash/cl/eval_sequence.sh`
+- `bash/cl/eval_joint.sh`
+- `bash/cl/pipeline_sequence.sh`
+- `bash/cl/pipeline_joint.sh`
 
 ### Modified existing files
 
@@ -57,6 +61,15 @@ The new code now covers CL training and CL inference. Evaluation is still kept s
   - main CL inference entrypoint
 - `configs/cl/infer_sequence.yaml`
 - `configs/cl/infer_joint.yaml`
+
+### New evaluation-side CL files
+
+- `cl_eval.py`
+  - main CL evaluation entrypoint
+- `cl_eval_props.py`
+  - property prediction, canonicalization, similarity, diversity, and TDC parallel predictors
+- `configs/cl/eval_sequence.yaml`
+- `configs/cl/eval_joint.yaml`
 
 ## CL Experiment Definition
 
@@ -195,6 +208,20 @@ Each prediction record contains:
 - `source_smiles`
 
 `response` is always a list and only contains model generations, never the prompt itself.
+
+Evaluation outputs:
+
+- `outputs/cl_eval/sequence/{method}/`
+- `outputs/cl_eval/joint/{joint_name}/`
+
+Files per evaluation root:
+
+- `task_level_metrics.csv`
+- `metrics_summary.csv`
+- `cl_summary.csv`
+- `seen_unseen_gap.csv`
+- `best_candidates.jsonl`
+- `eval_manifest.json`
 
 ## CL Inference
 
@@ -352,6 +379,59 @@ This resolves checkpoints, tasks, prompts, and output files without loading the 
 python cl_infer.py --config configs/cl/infer_sequence.yaml --dry-run
 ```
 
+### Sequence evaluation
+
+```bash
+bash bash/cl/eval_sequence.sh
+```
+
+or
+
+```bash
+python cl_eval.py --config configs/cl/eval_sequence.yaml
+```
+
+Example for replay outputs:
+
+```bash
+python cl_eval.py \
+  --config configs/cl/eval_sequence.yaml \
+  --method replay \
+  --input-root outputs/cl_infer/sequence/replay \
+  --train-root outputs/cl_train/replay \
+  --output-root outputs/cl_eval/sequence/replay
+```
+
+### Joint evaluation
+
+```bash
+bash bash/cl/eval_joint.sh
+```
+
+or
+
+```bash
+python cl_eval.py --config configs/cl/eval_joint.yaml
+```
+
+### One-shot pipeline
+
+Sequence:
+
+```bash
+bash bash/cl/pipeline_sequence.sh naive_sequence
+```
+
+```bash
+bash bash/cl/pipeline_sequence.sh replay
+```
+
+Joint:
+
+```bash
+bash bash/cl/pipeline_joint.sh
+```
+
 ### Useful overrides
 
 Subset of steps:
@@ -395,3 +475,20 @@ python cl_train.py \
 3. Inspect `outputs/cl_train/replay/step*/train_manifest.json`
 4. Start real training once dry-run looks correct
 5. Implement or wire CL inference/evaluation later
+
+
+  ┌────────────┬────────────┬─────────────────┬─────────────────────┐                                                             
+  │ 单属性 (4) │ 双属性 (6) │   三属性 (4)    │     四属性 (1)      │
+  ├────────────┼────────────┼─────────────────┼─────────────────────┤                                                             
+  │ drd2       │ drd2+plogp │ drd2+plogp+qed  │ jnk3+drd2+plogp+qed │
+  ├────────────┼────────────┼─────────────────┼─────────────────────┤
+  │ jnk3       │ drd2+qed   │ jnk3+drd2+plogp │                     │
+  ├────────────┼────────────┼─────────────────┼─────────────────────┤
+  │ plogp      │ jnk3+drd2  │ jnk3+drd2+qed   │                     │
+  ├────────────┼────────────┼─────────────────┼─────────────────────┤
+  │ qed        │ jnk3+plogp │ jnk3+plogp+qed  │                     │
+  ├────────────┼────────────┼─────────────────┼─────────────────────┤
+  │            │ jnk3+qed   │                 │                     │
+  ├────────────┼────────────┼─────────────────┼─────────────────────┤
+  │            │ plogp+qed  │                 │                     │
+  └────────────┴────────────┴─────────────────┴─────────────────────┘

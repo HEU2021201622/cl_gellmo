@@ -1,0 +1,8 @@
+mode: sequence
+method: naive_sequence
+data_root: data
+test_file: all_data/test.json
+seen_smiles_file: unique_mols_in_one_ds_pairs.txt
+settings: [seen]
+num_workers: 8
+batch_size: 1024

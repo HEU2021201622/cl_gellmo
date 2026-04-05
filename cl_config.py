@@ -123,6 +123,45 @@ def load_cl_infer_config(config_path: str) -> Dict[str, Any]:
     return config
 
 
+def load_cl_eval_config(config_path: str) -> Dict[str, Any]:
+    config_file = Path(config_path)
+    config = load_yaml(str(config_file))
+
+    base_config_path = config.get("base_config")
+    if base_config_path:
+        base_file = (config_file.parent / base_config_path).resolve()
+        base_config = load_yaml(str(base_file))
+        config = _deep_merge(base_config, config)
+
+    config.setdefault("data_root", "data")
+    config.setdefault("test_file", "all_data/test.json")
+    config.setdefault("seen_smiles_file", "unique_mols_in_one_ds_pairs.txt")
+    config.setdefault("settings", ["seen"])
+    config.setdefault("num_workers", 8)
+    config.setdefault("batch_size", 1024)
+    config.setdefault("cache_path", None)
+    config.setdefault("allow_missing_unseen", True)
+    config.setdefault("allow_missing_tasks", False)
+
+    mode = config.get("mode")
+    if mode == "sequence":
+        config.setdefault("method", "naive_sequence")
+        config.setdefault("input_root", f"outputs/cl_infer/sequence/{config['method']}")
+        config.setdefault("train_root", f"outputs/cl_train/{config['method']}")
+        config.setdefault("output_root", f"outputs/cl_eval/sequence/{config['method']}")
+        config.setdefault("steps", {})
+    elif mode == "joint":
+        config.setdefault("joint_name", "joint_all")
+        config.setdefault("input_root", f"outputs/cl_infer/joint/{config['joint_name']}")
+        config.setdefault("train_root", f"outputs/cl_train/{config['joint_name']}")
+        config.setdefault("output_root", f"outputs/cl_eval/joint/{config['joint_name']}")
+        config.setdefault("runs", {})
+    else:
+        raise ValueError("Eval config must define `mode` as `sequence` or `joint`.")
+
+    return config
+
+
 def iter_step_names(config: Dict[str, Any]) -> Iterable[str]:
     if config["method"] == "joint_all":
         return ["all"]
