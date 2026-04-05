@@ -35,7 +35,6 @@ LORA_TARGET_MODULES_BY_FAMILY = {
         "gate_proj",
         "up_proj",
         "down_proj",
-        "lm_head",
     ],
     "llama": [
         "q_proj",
@@ -45,7 +44,6 @@ LORA_TARGET_MODULES_BY_FAMILY = {
         "gate_proj",
         "up_proj",
         "down_proj",
-        "lm_head",
     ],
 }
 CL_OUTPUT_DIRS = {

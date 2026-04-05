@@ -126,7 +126,8 @@ The default target modules for both are currently:
 - `gate_proj`
 - `up_proj`
 - `down_proj`
-- `lm_head`
+
+By default, `lm_head` is not included in LoRA target modules. This avoids PEFT switching on extra embedding-layer saving during checkpoint export, which makes CL step-end saves heavier than necessary.
 
 This means the server-side local Llama path below is expected to be auto-detected as a `llama` model:
 
