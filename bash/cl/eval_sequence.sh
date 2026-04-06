@@ -18,7 +18,7 @@ if ! command -v conda >/dev/null 2>&1; then
   fi
 fi
 
-LOCAL_ENV=${LOCAL_ENV:-evaluation}
+LOCAL_ENV=${LOCAL_ENV:-evaluate}
 TDC_ENV=${TDC_ENV:-pmo}
 
 conda run -n "$LOCAL_ENV" python cl_eval_predict_local.py --config "$CONFIG" "$@"
