@@ -107,12 +107,10 @@ def predict_tdc_parallel(
     return {smiles_list[i]: results[i] for i in range(len(smiles_list))}
 
 
-def predict_properties_for_smiles(
+def predict_local_properties_for_smiles(
     smiles_list: Iterable[str],
     properties: Sequence[str],
     *,
-    num_workers: int,
-    batch_size: int,
     cache_path: str = None,
 ) -> pd.DataFrame:
     props_dir = Path(__file__).resolve().parent / "data" / "props"
@@ -120,11 +118,73 @@ def predict_properties_for_smiles(
         sys.path.insert(0, str(props_dir))
     from properties import drd2, penalized_logp, qed, sas
 
-    property_list = [prop for prop in dict.fromkeys(properties) if prop != "sas"]
+    property_list = [prop for prop in dict.fromkeys(properties) if prop not in {"sas", "jnk3", "gsk3b"}]
     smiles_list = [smiles for smiles in dict.fromkeys(smiles_list) if smiles]
     if not smiles_list:
         columns = ["smiles"] + property_list + ["sas"]
         return pd.DataFrame(columns=columns)
+
+    cache = {}
+    if cache_path:
+        try:
+            cache_df = pd.read_csv(cache_path)
+            cache_df = cache_df.fillna("")
+            for record in cache_df.to_dict(orient="records"):
+                cache[record["smiles"]] = record
+        except FileNotFoundError:
+            pass
+
+    rows = []
+    missing = []
+    for smiles in smiles_list:
+        cached = cache.get(smiles)
+        if cached and all(prop in cached and cached[prop] != "" for prop in property_list):
+            rows.append(cached)
+        else:
+            missing.append(smiles)
+
+    predicted_rows = []
+    if missing:
+        for smiles in missing:
+            row = {"smiles": smiles}
+            for prop in property_list:
+                if prop == "drd2":
+                    row[prop] = float(drd2(smiles))
+                elif prop == "qed":
+                    row[prop] = float(qed(smiles))
+                elif prop == "plogp":
+                    row[prop] = float(penalized_logp(smiles))
+                else:
+                    raise ValueError(f"Unsupported local property predictor: {prop}")
+            row["sas"] = float(sas(smiles))
+            predicted_rows.append(row)
+
+    all_rows = rows + predicted_rows
+    df = pd.DataFrame(all_rows)
+    if cache_path and not df.empty:
+        merged = df
+        if cache:
+            previous_df = pd.DataFrame(cache.values())
+            merged = pd.concat([previous_df, df], ignore_index=True)
+            merged = merged.drop_duplicates(subset=["smiles"], keep="last")
+        merged.to_csv(cache_path, index=False)
+    return df
+
+
+def predict_tdc_properties_for_smiles(
+    smiles_list: Iterable[str],
+    properties: Sequence[str],
+    *,
+    num_workers: int,
+    batch_size: int,
+    cache_path: str = None,
+) -> pd.DataFrame:
+    property_list = [prop for prop in dict.fromkeys(properties) if prop in {"jnk3", "gsk3b"}]
+    smiles_list = [smiles for smiles in dict.fromkeys(smiles_list) if smiles]
+    if not property_list:
+        return pd.DataFrame(columns=["smiles"])
+    if not smiles_list:
+        return pd.DataFrame(columns=["smiles"] + property_list)
 
     cache = {}
     if cache_path:
@@ -153,23 +213,10 @@ def predict_properties_for_smiles(
                 tdc_targets[prop] = predict_tdc_parallel(missing, "JNK3", num_workers=num_workers, batch_size=batch_size)
             elif prop == "gsk3b":
                 tdc_targets[prop] = predict_tdc_parallel(missing, "GSK3B", num_workers=num_workers, batch_size=batch_size)
-
         for smiles in missing:
             row = {"smiles": smiles}
             for prop in property_list:
-                if prop == "drd2":
-                    row[prop] = float(drd2(smiles))
-                elif prop == "qed":
-                    row[prop] = float(qed(smiles))
-                elif prop == "plogp":
-                    row[prop] = float(penalized_logp(smiles))
-                elif prop == "jnk3":
-                    row[prop] = float(tdc_targets["jnk3"][smiles])
-                elif prop == "gsk3b":
-                    row[prop] = float(tdc_targets["gsk3b"][smiles])
-                else:
-                    raise ValueError(f"Unsupported property predictor: {prop}")
-            row["sas"] = float(sas(smiles))
+                row[prop] = float(tdc_targets[prop][smiles])
             predicted_rows.append(row)
 
     all_rows = rows + predicted_rows
@@ -182,6 +229,28 @@ def predict_properties_for_smiles(
             merged = merged.drop_duplicates(subset=["smiles"], keep="last")
         merged.to_csv(cache_path, index=False)
     return df
+
+
+def load_property_cache(cache_path: str) -> pd.DataFrame:
+    path = Path(cache_path)
+    if not path.exists():
+        return pd.DataFrame(columns=["smiles"])
+    return pd.read_csv(path)
+
+
+def merge_property_caches(cache_paths: Sequence[str]) -> pd.DataFrame:
+    merged = None
+    for cache_path in cache_paths:
+        if not cache_path:
+            continue
+        df = load_property_cache(cache_path)
+        if df.empty:
+            continue
+        merged = df if merged is None else merged.merge(df, on="smiles", how="outer")
+    if merged is None:
+        return pd.DataFrame(columns=["smiles"])
+    merged = merged.loc[:, ~merged.columns.duplicated()]
+    return merged
 
 
 def normalized_improvement(delta: float, threshold: float) -> float:

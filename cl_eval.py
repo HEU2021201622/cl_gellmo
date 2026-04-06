@@ -1,30 +1,32 @@
 import argparse
 import json
 import math
-import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Dict, Iterable, List, Sequence
 
 import pandas as pd
 
 from cl_config import load_cl_eval_config
 from cl_data import load_pairwise_records, normalize_task_name
+from cl_eval_data import (
+    discover_jobs,
+    extract_candidate_smiles,
+    load_json_records,
+    task_properties,
+)
 from cl_eval_props import (
-    canonicalize_smiles,
     composite_score,
     compute_fp_diversity,
     compute_scaffold_diversity,
     hypervolume,
+    merge_property_caches,
     normalized_improvement,
     pair_similarity,
-    predict_properties_for_smiles,
     safe_mean,
 )
 from cl_manifest import ensure_dir, write_json, write_jsonl
 from config import PROPERTY_IMPV_THRESHOLDS
-
-SMILES_PATTERN = re.compile(r"<SMILES>\s*([A-Za-z0-9@+\-\[\]\(\)\\/%=#$.:]+)\s*</SMILES>")
 STEP_INTRODUCED_PROPERTY = {
     "step1": "drd2",
     "step2": "qed",
@@ -50,11 +52,14 @@ def parse_args():
     parser.add_argument("--tasks", nargs="+", default=None)
     parser.add_argument("--num-workers", type=int, default=None)
     parser.add_argument("--batch-size", type=int, default=None)
-    parser.add_argument("--cache-path", default=None)
+    parser.add_argument("--local-cache-path", default=None)
+    parser.add_argument("--tdc-cache-path", default=None)
     return parser.parse_args()
 
 
 def apply_overrides(config: Dict, args) -> Dict:
+    local_cache_overridden = args.local_cache_path is not None
+    tdc_cache_overridden = args.tdc_cache_path is not None
     if args.mode:
         config["mode"] = args.mode
     if args.method:
@@ -95,97 +100,15 @@ def apply_overrides(config: Dict, args) -> Dict:
         config["num_workers"] = args.num_workers
     if args.batch_size is not None:
         config["batch_size"] = args.batch_size
-    if args.cache_path:
-        config["cache_path"] = args.cache_path
+    if args.local_cache_path:
+        config["local_cache_path"] = args.local_cache_path
+    if args.tdc_cache_path:
+        config["tdc_cache_path"] = args.tdc_cache_path
+    if args.output_root and not local_cache_overridden:
+        config["local_cache_path"] = str(Path(config["output_root"]) / "property_cache_local.csv")
+    if args.output_root and not tdc_cache_overridden:
+        config["tdc_cache_path"] = str(Path(config["output_root"]) / "property_cache_tdc.csv")
     return config
-
-
-def load_json_records(path: Path) -> List[Dict]:
-    with open(path, "r") as handle:
-        return json.load(handle)
-
-
-def load_train_manifest(path: Path) -> Dict:
-    with open(path, "r") as handle:
-        return json.load(handle)
-
-
-def discover_sequence_jobs(config: Dict) -> List[Dict]:
-    input_root = Path(config["input_root"])
-    train_root = Path(config["train_root"])
-    jobs = []
-    steps_filter = config.get("_steps_filter")
-    tasks_filter = config.get("_tasks_filter")
-    declared_steps = set((config.get("steps") or {}).keys())
-    step_dirs = sorted([path for path in input_root.iterdir() if path.is_dir()]) if input_root.exists() else []
-    for step_dir in step_dirs:
-        step_name = step_dir.name
-        if steps_filter and step_name not in steps_filter:
-            continue
-        if declared_steps and step_name not in declared_steps:
-            continue
-        train_manifest = load_train_manifest(train_root / step_name / "train_manifest.json")
-        for task_dir in sorted([path for path in step_dir.iterdir() if path.is_dir()]):
-            task_name = normalize_task_name(task_dir.name)
-            if tasks_filter and task_name not in tasks_filter:
-                continue
-            for setting_dir in sorted([path for path in task_dir.iterdir() if path.is_dir()]):
-                setting = setting_dir.name
-                if setting not in config["settings"]:
-                    continue
-                prediction_path = setting_dir / "predictions.json"
-                if not prediction_path.exists():
-                    continue
-                jobs.append(
-                    {
-                        "mode": "sequence",
-                        "unit_name": step_name,
-                        "task": task_name,
-                        "setting": setting,
-                        "prediction_path": prediction_path,
-                        "train_manifest": train_manifest,
-                    }
-                )
-    return jobs
-
-
-def discover_joint_jobs(config: Dict) -> List[Dict]:
-    input_root = Path(config["input_root"])
-    train_root = Path(config["train_root"])
-    jobs = []
-    runs_filter = config.get("_runs_filter")
-    tasks_filter = config.get("_tasks_filter")
-    declared_runs = set((config.get("runs") or {}).keys())
-    run_dirs = sorted([path for path in input_root.iterdir() if path.is_dir()]) if input_root.exists() else []
-    for run_dir in run_dirs:
-        run_name = run_dir.name
-        if runs_filter and run_name not in runs_filter:
-            continue
-        if declared_runs and run_name not in declared_runs:
-            continue
-        train_manifest = load_train_manifest(train_root / run_name / "train_manifest.json")
-        for task_dir in sorted([path for path in run_dir.iterdir() if path.is_dir()]):
-            task_name = normalize_task_name(task_dir.name)
-            if tasks_filter and task_name not in tasks_filter:
-                continue
-            for setting_dir in sorted([path for path in task_dir.iterdir() if path.is_dir()]):
-                setting = setting_dir.name
-                if setting not in config["settings"]:
-                    continue
-                prediction_path = setting_dir / "predictions.json"
-                if not prediction_path.exists():
-                    continue
-                jobs.append(
-                    {
-                        "mode": "joint",
-                        "unit_name": run_name,
-                        "task": task_name,
-                        "setting": setting,
-                        "prediction_path": prediction_path,
-                        "train_manifest": train_manifest,
-                    }
-                )
-    return jobs
 
 
 def load_seen_smiles(path: Path) -> set:
@@ -202,17 +125,6 @@ def build_test_lookup(test_records: Iterable[Dict]) -> Dict:
         for index, record in enumerate(records):
             lookup[(key[0], key[1], record["source_smiles"], index)] = record
     return lookup
-
-
-def extract_candidate_smiles(response_list: Sequence[str]) -> List[str]:
-    candidates = []
-    for response in response_list or []:
-        matches = SMILES_PATTERN.findall(response or "")
-        for match in matches:
-            canonical = canonicalize_smiles(match.strip())
-            if canonical and canonical not in candidates:
-                candidates.append(canonical)
-    return candidates
 
 
 def property_threshold(prop: str) -> float:
@@ -288,17 +200,20 @@ def build_candidate_occurrences(predictions: List[Dict], test_lookup: Dict, task
 
 def evaluate_task(job: Dict, test_lookup: Dict, seen_smiles: set, config: Dict) -> Dict:
     predictions = load_json_records(job["prediction_path"])
-    task_props = normalize_task_name(job["task"]).split("+")
+    task_props = task_properties(job["task"])
     candidate_rows, unique_smiles = build_candidate_occurrences(predictions, test_lookup, job["task"], job["setting"])
-    property_df = predict_properties_for_smiles(
-        unique_smiles,
-        list(task_props) + ["sas"],
-        num_workers=config["num_workers"],
-        batch_size=config["batch_size"],
-        cache_path=config.get("cache_path"),
-    )
+    property_df = merge_property_caches([config.get("local_cache_path"), config.get("tdc_cache_path")])
     property_df = property_df.drop_duplicates(subset=["smiles"], keep="last")
     property_df = property_df.set_index("smiles") if not property_df.empty else pd.DataFrame(columns=["smiles"]).set_index(pd.Index([]))
+    for column in list(task_props) + ["sas"]:
+        if column not in property_df.columns:
+            property_df[column] = pd.Series(dtype=float)
+    missing_columns = [column for column in task_props if column not in property_df.columns]
+    if missing_columns and not property_df.empty:
+        raise ValueError(
+            f"Missing property columns {missing_columns} for task={job['task']}. "
+            f"Run local/TDC property prediction first."
+        )
 
     num_inputs = len(candidate_rows)
     num_valid_inputs = 0
@@ -511,7 +426,7 @@ def main():
     seen_smiles = load_seen_smiles(data_root / config["seen_smiles_file"])
     test_lookup = build_test_lookup(test_records)
 
-    jobs = discover_sequence_jobs(config) if config["mode"] == "sequence" else discover_joint_jobs(config)
+    jobs = discover_jobs(config)
     if not jobs:
         raise ValueError(f"No evaluation jobs discovered under {config['input_root']}")
 

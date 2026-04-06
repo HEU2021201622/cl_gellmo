@@ -230,6 +230,12 @@ Evaluation now reports two success-rate styles:
 - `SR_dir`
   - direction-only success rate following the original GeLLMO notebook style
 
+Evaluation environment split:
+
+- local properties (`drd2`, `qed`, `plogp`, `sas`, RDKit metrics) run in the `evaluation` env by default
+- TDC properties (`jnk3`, `gsk3b`) run in the `pmo` env by default
+- the bash entrypoints first build property caches in those two envs, then run the final metric aggregation
+
 ## CL Inference
 
 The CL inference path keeps the original GeLLMO prompt style:
@@ -396,6 +402,14 @@ or
 
 ```bash
 python cl_eval.py --config configs/cl/eval_sequence.yaml
+```
+
+If you want to run the three evaluation stages manually:
+
+```bash
+conda run -n evaluation python cl_eval_predict_local.py --config configs/cl/eval_sequence.yaml
+conda run -n pmo python cl_eval_predict_tdc.py --config configs/cl/eval_sequence.yaml
+conda run -n evaluation python cl_eval.py --config configs/cl/eval_sequence.yaml
 ```
 
 Example for replay outputs:
