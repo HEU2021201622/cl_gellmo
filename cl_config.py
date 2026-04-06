@@ -140,8 +140,6 @@ def load_cl_eval_config(config_path: str) -> Dict[str, Any]:
     config.setdefault("num_workers", 8)
     config.setdefault("batch_size", 1024)
     config.setdefault("cache_path", None)
-    config.setdefault("local_cache_path", None)
-    config.setdefault("tdc_cache_path", None)
     config.setdefault("local_env_name", "evaluation")
     config.setdefault("tdc_env_name", "pmo")
     config.setdefault("allow_missing_unseen", True)
@@ -153,19 +151,20 @@ def load_cl_eval_config(config_path: str) -> Dict[str, Any]:
         config.setdefault("input_root", f"outputs/cl_infer/sequence/{config['method']}")
         config.setdefault("train_root", f"outputs/cl_train/{config['method']}")
         config.setdefault("output_root", f"outputs/cl_eval/sequence/{config['method']}")
-        config.setdefault("local_cache_path", str(Path(config["output_root"]) / "property_cache_local.csv"))
-        config.setdefault("tdc_cache_path", str(Path(config["output_root"]) / "property_cache_tdc.csv"))
         config.setdefault("steps", {})
     elif mode == "joint":
         config.setdefault("joint_name", "joint_all")
         config.setdefault("input_root", f"outputs/cl_infer/joint/{config['joint_name']}")
         config.setdefault("train_root", f"outputs/cl_train/{config['joint_name']}")
         config.setdefault("output_root", f"outputs/cl_eval/joint/{config['joint_name']}")
-        config.setdefault("local_cache_path", str(Path(config["output_root"]) / "property_cache_local.csv"))
-        config.setdefault("tdc_cache_path", str(Path(config["output_root"]) / "property_cache_tdc.csv"))
         config.setdefault("runs", {})
     else:
         raise ValueError("Eval config must define `mode` as `sequence` or `joint`.")
+
+    if not config.get("local_cache_path"):
+        config["local_cache_path"] = str(Path(config["output_root"]) / "property_cache_local.csv")
+    if not config.get("tdc_cache_path"):
+        config["tdc_cache_path"] = str(Path(config["output_root"]) / "property_cache_tdc.csv")
 
     return config
 
