@@ -1,18 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if ! command -v conda >/dev/null 2>&1; then
-  if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-    source "$HOME/miniconda3/etc/profile.d/conda.sh"
-  elif [ -f "$HOME/bin/miniforge3/etc/profile.d/conda.sh" ]; then
-    source "$HOME/bin/miniforge3/etc/profile.d/conda.sh"
-  elif [ -f "$HOME/workspace/miniconda3/etc/profile.d/conda.sh" ]; then
-    source "$HOME/workspace/miniconda3/etc/profile.d/conda.sh"
-  else
-    echo "conda command not found and no known conda.sh init script was found." >&2
-    exit 1
-  fi
-fi
+source ~/.bashrc
+eval "$(conda shell.bash hook)"
 
 METHOD=${1:-naive_sequence}
 TRAIN_CONFIG=${2:-configs/cl/${METHOD}.yaml}
